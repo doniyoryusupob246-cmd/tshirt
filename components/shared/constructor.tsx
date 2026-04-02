@@ -104,10 +104,12 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                           after:border-(--border-color)
                           data-[active=true]:after:opacity-100
                           transition"
-                        style={{
-                          backgroundColor: color.color,
-                          '--border-color': color.color,
-                        }}
+                        style={
+                          {
+                            backgroundColor: color.color,
+                            '--border-color': color.color,
+                          } as React.CSSProperties & Record<string, string>
+                        }
                         data-active={selectColor === color.id}
                       />
                     ))}
