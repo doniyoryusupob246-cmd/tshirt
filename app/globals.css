@@ -1,8 +1,32 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
+body {
+  font-family: 'montserrat', sans-serif;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* трек */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ползунок */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
 
 @theme inline {
   --color-background: var(--background);
