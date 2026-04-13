@@ -6,6 +6,7 @@ export const designs = [
     image: '/design/games/dota-white.png',
     postImage: '/design-post/dota-white.jpg',
     light: false,
+    allowedColors: ['black', 'brown'],
   },
   {
     id: '2',
@@ -14,6 +15,7 @@ export const designs = [
     image: '/design/games/dota-red.png',
     postImage: '/design-post/dota-red.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '3',
@@ -21,6 +23,7 @@ export const designs = [
     name: 'Dota Gray',
     image: '/design/games/dota-gray.png',
     postImage: '/design-post/dota-gray.jpg',
+    allowedColors: ['black', 'brown', 'white'],
     light: true,
   },
   {
@@ -30,6 +33,7 @@ export const designs = [
     image: '/design/games/dota-red-bg.png',
     postImage: '/design-post/dota-red-bg.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '5',
@@ -38,6 +42,7 @@ export const designs = [
     image: '/design/games/cs-gold.png',
     postImage: '/design-post/csgo-gold.jpg',
     light: true,
+    allowedColors: ['white'],
   },
   {
     id: '6',
@@ -46,6 +51,7 @@ export const designs = [
     image: '/design/games/cs-white.png',
     postImage: '/design-post/csgo-white.jpg',
     light: true,
+    allowedColors: ['black', 'brown'],
   },
   {
     id: '7',
@@ -53,6 +59,7 @@ export const designs = [
     name: 'CS GO Soldier',
     image: '/design/games/cs-soldier.png',
     postImage: '/design-post/soldier.jpg',
+    allowedColors: ['black', 'brown', 'white'],
     light: true,
   },
   {
@@ -61,6 +68,7 @@ export const designs = [
     name: 'CS GO Logo Black',
     image: '/design/games/cs-logo-black.png',
     postImage: '/design-post/csgo-black-logo.jpg',
+    allowedColors: ['white'],
     light: true,
   },
   {
@@ -69,6 +77,7 @@ export const designs = [
     name: 'CS GO Logo White',
     image: '/design/games/cs-logo-white.png',
     postImage: '/design-post/csgo-white-logo.jpg',
+    allowedColors: ['black', 'brown'],
     light: false,
   },
 
@@ -78,6 +87,7 @@ export const designs = [
     name: 'GTA5',
     image: '/design/games/gta5.png',
     postImage: '/design-post/gta.jpg',
+    allowedColors: ['black', 'brown', 'white'],
     light: true,
   },
   {
@@ -86,6 +96,7 @@ export const designs = [
     name: 'Wanted White',
     image: '/design/games/wanted-white.png',
     postImage: '/design-post/wanted-white.jpg',
+    allowedColors: ['black', 'brown'],
     light: false,
   },
   {
@@ -94,6 +105,7 @@ export const designs = [
     name: 'Wanted Black',
     image: '/design/games/wanted-black.png',
     postImage: '/design-post/wanted-black.jpg',
+    allowedColors: ['white'],
     light: true,
   },
   {
@@ -103,6 +115,7 @@ export const designs = [
     image: '/design/games/gta-logo.png',
     postImage: '/design-post/gta-logo.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '14',
@@ -111,6 +124,7 @@ export const designs = [
     image: '/design/games/ea-logo-gray.png',
     postImage: '/design-post/ea-gray.jpg',
     light: true,
+    allowedColors: ['white'],
   },
   {
     id: '15',
@@ -119,6 +133,7 @@ export const designs = [
     image: '/design/games/ea-logo-white.png',
     postImage: '/design-post/ea-white.jpg',
     light: false,
+    allowedColors: ['black', 'brown'],
   },
   {
     id: '16',
@@ -127,6 +142,7 @@ export const designs = [
     image: '/design/games/mortal-combat-red.png',
     postImage: '/design-post/mortal-combat.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
 
   {
@@ -136,6 +152,7 @@ export const designs = [
     image: '/design/games/mortal-combat-black.png',
     postImage: '/design-post/mortal-combat-black.jpg',
     light: true,
+    allowedColors: ['white'],
   },
 
   {
@@ -145,6 +162,7 @@ export const designs = [
     image: '/design/games/mortal-combat-white.png',
     postImage: '/design-post/mortal-combat-white.jpg',
     light: false,
+    allowedColors: ['black', 'brown'],
   },
 
   {
@@ -154,6 +172,7 @@ export const designs = [
     image: '/design/games/mortal-combat-gold.png',
     postImage: '/design-post/mortal-combat-gold.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '20',
@@ -162,6 +181,7 @@ export const designs = [
     image: '/design/games/minicraft-1.png',
     postImage: '/design-post/minicraft-1.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '21',
@@ -169,6 +189,7 @@ export const designs = [
     name: 'Minicraft 2',
     image: '/design/games/minicraft-2.png',
     postImage: '/design-post/minicraft-2.jpg',
+    allowedColors: ['black', 'brown', 'white'],
     light: true,
   },
   {
@@ -177,23 +198,26 @@ export const designs = [
     name: 'Pubg',
     image: '/design/games/pubg.png',
     postImage: '/design-post/pubg.jpg',
+    allowedColors: ['black', 'brown', 'white'],
     light: true,
   },
   {
     id: '23',
     category: 'games',
-    name: 'Pubg',
+    name: 'Nfs',
     image: '/design/games/nfs-white.png',
     postImage: '/design-post/nfs-white.jpg',
+    allowedColors: ['black', 'brown'],
     light: false,
   },
   {
     id: '24',
     category: 'games',
-    name: 'Pubg',
+    name: 'Nfs',
     image: '/design/games/nfs-black.png',
     postImage: '/design-post/nfs-black.jpg',
     light: true,
+    allowedColors: ['white'],
   },
 
   {
@@ -203,6 +227,7 @@ export const designs = [
     image: '/design/multfilms/1.png',
     postImage: '/design-post/multfilms/1.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '26',
@@ -211,6 +236,7 @@ export const designs = [
     image: '/design/multfilms/2.png',
     postImage: '/design-post/multfilms/2.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '27',
@@ -219,6 +245,7 @@ export const designs = [
     image: '/design/multfilms/3.png',
     postImage: '/design-post/multfilms/3.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '28',
@@ -227,6 +254,7 @@ export const designs = [
     image: '/design/multfilms/4.png',
     postImage: '/design-post/multfilms/4.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '29',
@@ -235,6 +263,7 @@ export const designs = [
     image: '/design/multfilms/5.png',
     postImage: '/design-post/multfilms/5.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '30',
@@ -243,6 +272,7 @@ export const designs = [
     image: '/design/multfilms/6.png',
     postImage: '/design-post/multfilms/6.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '31',
@@ -251,6 +281,7 @@ export const designs = [
     image: '/design/multfilms/7.png',
     postImage: '/design-post/multfilms/7.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '32',
@@ -259,6 +290,7 @@ export const designs = [
     image: '/design/multfilms/8.png',
     postImage: '/design-post/multfilms/8.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '33',
@@ -267,6 +299,7 @@ export const designs = [
     image: '/design/multfilms/9.png',
     postImage: '/design-post/multfilms/9.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '34',
@@ -275,6 +308,7 @@ export const designs = [
     image: '/design/multfilms/10.png',
     postImage: '/design-post/multfilms/10.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '35',
@@ -283,6 +317,7 @@ export const designs = [
     image: '/design/multfilms/11.png',
     postImage: '/design-post/multfilms/11.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '36',
@@ -291,6 +326,7 @@ export const designs = [
     image: '/design/multfilms/12.png',
     postImage: '/design-post/multfilms/12.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '37',
@@ -299,6 +335,7 @@ export const designs = [
     image: '/design/multfilms/13.png',
     postImage: '/design-post/multfilms/13.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '38',
@@ -307,6 +344,7 @@ export const designs = [
     image: '/design/multfilms/14.png',
     postImage: '/design-post/multfilms/14.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '39',
@@ -315,6 +353,7 @@ export const designs = [
     image: '/design/multfilms/15.png',
     postImage: '/design-post/multfilms/15.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
 
   {
@@ -324,6 +363,7 @@ export const designs = [
     image: '/design/multfilms/16.png',
     postImage: '/design-post/multfilms/16.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
   {
     id: '41',
@@ -332,6 +372,7 @@ export const designs = [
     image: '/design/multfilms/17.png',
     postImage: '/design-post/multfilms/17.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
 
   {
@@ -341,5 +382,6 @@ export const designs = [
     image: '/design/multfilms/19.png',
     postImage: '/design-post/multfilms/18.jpg',
     light: true,
+    allowedColors: ['black', 'brown', 'white'],
   },
 ];
