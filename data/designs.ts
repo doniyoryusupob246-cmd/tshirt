@@ -227,7 +227,7 @@ export const designs = [
     image: '/design/multfilms/1.png',
     postImage: '/design-post/multfilms/1.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['white'],
   },
   {
     id: '26',
@@ -236,7 +236,7 @@ export const designs = [
     image: '/design/multfilms/2.png',
     postImage: '/design-post/multfilms/2.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['black', 'brown'],
   },
   {
     id: '27',
@@ -254,7 +254,7 @@ export const designs = [
     image: '/design/multfilms/4.png',
     postImage: '/design-post/multfilms/4.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['white'],
   },
   {
     id: '29',
@@ -263,7 +263,7 @@ export const designs = [
     image: '/design/multfilms/5.png',
     postImage: '/design-post/multfilms/5.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['black', 'brown'],
   },
   {
     id: '30',
@@ -272,7 +272,7 @@ export const designs = [
     image: '/design/multfilms/6.png',
     postImage: '/design-post/multfilms/6.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['white'],
   },
   {
     id: '31',
@@ -281,7 +281,7 @@ export const designs = [
     image: '/design/multfilms/7.png',
     postImage: '/design-post/multfilms/7.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['brown'],
   },
   {
     id: '32',
@@ -290,7 +290,7 @@ export const designs = [
     image: '/design/multfilms/8.png',
     postImage: '/design-post/multfilms/8.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['black'],
   },
   {
     id: '33',
@@ -326,7 +326,7 @@ export const designs = [
     image: '/design/multfilms/12.png',
     postImage: '/design-post/multfilms/12.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['white'],
   },
   {
     id: '37',
@@ -335,7 +335,7 @@ export const designs = [
     image: '/design/multfilms/13.png',
     postImage: '/design-post/multfilms/13.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['black', 'brown'],
   },
   {
     id: '38',
@@ -353,7 +353,7 @@ export const designs = [
     image: '/design/multfilms/15.png',
     postImage: '/design-post/multfilms/15.jpg',
     light: true,
-    allowedColors: ['black', 'brown', 'white'],
+    allowedColors: ['brown'],
   },
 
   {
