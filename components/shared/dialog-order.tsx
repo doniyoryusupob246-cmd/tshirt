@@ -16,8 +16,14 @@ interface Props {
   selectedColor: Color | null;
   selectedPrint: Print | null;
   selectSize: string;
+  selectBack: boolean;
 }
-export const DialogOrder: React.FC<Props> = ({ selectedColor, selectedPrint, selectSize }) => {
+export const DialogOrder: React.FC<Props> = ({
+  selectBack,
+  selectedColor,
+  selectedPrint,
+  selectSize,
+}) => {
   console.log(selectedColor, selectedPrint);
   return (
     <Dialog>
@@ -69,6 +75,7 @@ export const DialogOrder: React.FC<Props> = ({ selectedColor, selectedPrint, sel
 
             {/* PREVIEW */}
             <div className="w-full md:w-[50%] h-full flex items-center justify-center flex-col">
+              <h2>{selectBack ? 'Задняя часть' : 'Передняя часть'}</h2>
               <div className="relative max-w-[200px] md:max-w-[300px]">
                 <Image
                   className="w-full mb-5 absolute"
@@ -80,7 +87,11 @@ export const DialogOrder: React.FC<Props> = ({ selectedColor, selectedPrint, sel
 
                 <Image
                   className="w-full mb-5"
-                  src={selectedColor?.img || ''}
+                  src={
+                    selectBack == false
+                      ? selectedColor?.img || '/placeholder.png'
+                      : selectedColor?.back || '/placeholder.png'
+                  }
                   alt=""
                   width={300}
                   height={300}

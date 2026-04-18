@@ -36,6 +36,7 @@ export type Color = {
   name: string;
   img: string;
   color: string;
+  back: string;
 };
 
 const size = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -45,7 +46,10 @@ export const Constructor: React.FC<Props> = ({ className }) => {
   const [selectColor, setSelectColor] = React.useState(shirt[0].id);
   const [selectSize, setSelectSize] = React.useState(size[0]);
   const [categories, setCategories] = React.useState<string>('games');
+  const [isBack, setIsBack] = React.useState(false);
+  const [backPrint, setBackPrint] = React.useState();
 
+  const selectedBackPrint = designs.find((d) => d.id === backPrint);
   const selectedPrint = designs.find((d) => d.id === selectPrint);
   const selectedColor = shirt.find((s) => s.id === selectColor);
 
@@ -109,36 +113,67 @@ export const Constructor: React.FC<Props> = ({ className }) => {
           {/* RIGHT */}
           <div className="mt-[200px] md:mt-[0px] mx-auto bg-[radial-gradient(rgba(0,0,0,0.2)_1px,transparent_1px)] bg-size-[20px_20px] relative w-full md:w-[50%] flex items-center justify-center pt-5">
             <div className="relative w-full max-w-[320px] md:max-w-100">
-              <Image
-                className="w-full mb-5 absolute"
-                src={selectedPrint?.image || ''}
-                alt=""
-                width={500}
-                height={500}
-              />
+              <div className="flex justify-around mb-10">
+                <Button
+                  onClick={() => setIsBack(false)}
+                  className="h-[40px] cursor-pointer"
+                  variant={isBack == false ? 'default' : 'outline'}>
+                  Передняя часть
+                </Button>
+                <Button
+                  onClick={() => setIsBack(true)}
+                  className="h-[40px] cursor-pointer"
+                  variant={isBack == true ? 'default' : 'outline'}>
+                  Задняя часть
+                </Button>
+              </div>
+              <div className="card-container">
+                <div className={`card ${isBack ? 'flipped' : ''}`}>
+                  <div>
+                    <Image
+                      className="w-full mb-5 absolute"
+                      src={selectedPrint?.image || ''}
+                      alt=""
+                      width={500}
+                      height={500}
+                    />
 
-              <Image
-                className="w-full mb-5"
-                src={selectedColor?.img || ''}
-                alt=""
-                width={500}
-                height={500}
-              />
+                    <Image
+                      className="w-full mb-5"
+                      src={selectedColor?.img || ''}
+                      alt=""
+                      width={500}
+                      height={500}
+                    />
+                  </div>
+
+                  <div className="card-face back">
+                    <Image
+                      className="w-full mb-5 absolute"
+                      src={selectedPrint?.image || ''}
+                      alt=""
+                      width={500}
+                      height={500}
+                    />
+                    <Image src={selectedColor?.back || ''} alt="" width={500} height={500} />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* BOTTOM PANEL */}
-            <div className=" bg-linear-to-t from-white via-slate-200 to-slate-200 shadow-xl absolute w-[90%] md:w-[70%] h-auto md:h-37.5 -bottom-40 md:-bottom-10 rounded-xl p-3">
+            <div className=" bg-linear-to-t from-white via-slate-200 to-slate-200 shadow-xl absolute w-[90%] md:w-[70%] h-auto  -bottom-40 md:-bottom-10 rounded-xl p-3">
               <div className="flex flex-col gap-4">
                 {/* COLOR */}
-                <div>
-                  <h4 className="font-medium text-[13px] mb-1">Цвет футболки</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-[13px]">Цвет футболки:</h4>
 
                   <div className="flex flex-wrap gap-2">
                     {shirt.map((color) => (
                       <Button
                         key={color.id}
                         onClick={() => setSelectColor(color.id)}
-                        className="relative w-6.25 h-6.25 rounded-full
+                        className="cursor-pointer relative w-6.25 h-6.25 rounded-full
                           after:content-[''] after:absolute after:inset-0
                           after:rounded-full after:border-2
                           after:scale-125 after:opacity-0
@@ -178,6 +213,7 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                   <DialogOrder
                     selectedPrint={selectedPrint ?? null}
                     selectedColor={selectedColor ?? null}
+                    selectBack={isBack}
                     selectSize={selectSize}
                   />
                 </div>
