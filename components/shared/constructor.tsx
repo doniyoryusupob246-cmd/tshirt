@@ -4,19 +4,18 @@ import { Container } from './container';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import { Check } from 'lucide-react';
+import { Check, Grip, ImageUp, Trash, X } from 'lucide-react';
 import { shirt } from '@/data/tshirt';
 import { designs } from '@/data/designs';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
-import { DialogOrder } from './dialog-order';
 
+import { DialogOrder } from './dialog-order';
+import { SelectCategory } from './select-category';
+import { SelectDesign } from './select-design';
+import { Rnd } from 'react-rnd';
+import { SelectBackFornt } from './select-back-fornt';
+import { CanvaImage } from './canva-image';
+import { Input } from '../ui/input';
+import { FieldLabel } from '../ui/field';
 interface Props {
   className?: string;
 }
@@ -42,14 +41,26 @@ export type Color = {
 const size = ['S', 'M', 'L', 'XL', 'XXL'];
 
 export const Constructor: React.FC<Props> = ({ className }) => {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
   const [selectPrint, setSelectPrint] = React.useState<string>(designs[1].id);
   const [selectColor, setSelectColor] = React.useState(shirt[0].id);
+
   const [selectSize, setSelectSize] = React.useState(size[0]);
   const [categories, setCategories] = React.useState<string>('games');
+  const [uploadFile, setUploadFile] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
   const [isBack, setIsBack] = React.useState(false);
-  const [backPrint, setBackPrint] = React.useState();
+  const [isActiveResize, setIsActiveResize] = React.useState(false);
 
-  const selectedBackPrint = designs.find((d) => d.id === backPrint);
+  const [position, setPosition] = React.useState({
+    x: 150,
+    y: 150,
+    width: 80,
+    height: 80,
+  });
+
+  const [tabs, setTabs] = React.useState(false);
   const selectedPrint = designs.find((d) => d.id === selectPrint);
   const selectedColor = shirt.find((s) => s.id === selectColor);
 
@@ -57,7 +68,19 @@ export const Constructor: React.FC<Props> = ({ className }) => {
     (item) => item.category === categories && item.allowedColors.includes(selectColor),
   );
 
-  console.log(`Размер: ${selectSize}, Print: ${selectPrint}, Color: ${selectColor}`);
+  React.useEffect(() => {
+    if (!uploadFile) {
+      setPreview(null);
+      return;
+    }
+
+    const url = URL.createObjectURL(uploadFile);
+    setPreview(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [uploadFile]);
 
   return (
     <div className={cn('mt-10', className)}>
@@ -65,78 +88,104 @@ export const Constructor: React.FC<Props> = ({ className }) => {
         <div className="flex flex-col md:flex-row justify-between gap-5">
           {/* LEFT */}
           <div className="w-full md:w-[50%] h-100">
-            <h2 className="font-bold text-2xl">Футболки</h2>
-            <p className="text-[14px] text-[#8a8a8a]">Создайте свой дизайн</p>
-
-            <div className="w-full md:w-100 mt-5">
-              <div className="mb-5">
-                <p className="text-[14px] mb-2">Выберите категорию:</p>
-
-                <Select defaultValue="games" onValueChange={(value) => setCategories(value)}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Выберите" />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="games">Игры</SelectItem>
-                      <SelectItem value="multfilms">Мультики</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            <div className="flex items-center gap-30">
+              <div>
+                <h2 className="font-bold text-2xl">Футболки</h2>
+                <p className="text-[14px] text-[#8a8a8a]">Создайте свой дизайн</p>
               </div>
-
-              <div className="scrollbar gap-3 flex flex-wrap justify-between h-100 overflow-y-scroll">
-                {filtredDesigns.map((item) => (
-                  <div key={item.id} className="relative">
-                    {item.id === selectPrint && (
-                      <div className="absolute -bottom-1 right-0 z-50 flex items-center justify-center bg-black w-[18px] h-[18px] rounded-full">
-                        <Check size={15} className="text-[#a7a7a7]" />
-                      </div>
-                    )}
-
-                    <Button
-                      onClick={() => setSelectPrint(item.id)}
-                      className={cn(
-                        'lg:w-30 lg:h-30 w-[90px] h-[90px]',
-                        item.id === selectPrint && 'border border-[#a7a7a7]',
-                      )}
-                      variant="outline">
-                      <Image src={item.postImage} alt={item.name} width={120} height={120} />
-                    </Button>
-                  </div>
-                ))}
+              <div>
+                <Button
+                  onClick={() => setTabs(!tabs)}
+                  className="cursor-pointer"
+                  variant={'outline'}>
+                  {tabs ? 'Назад' : 'Создать дизайн'}
+                </Button>
               </div>
+            </div>
+
+            <div
+              className={cn(
+                'w-full md:w-100 mt-5 overflow-hidden transition-all duration-300',
+                tabs ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none',
+              )}>
+              <div className="w-full md:w-100">
+                <Input
+                  ref={inputRef}
+                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                  id="picture"
+                  type="file"
+                />
+                <FieldLabel
+                  className="border border-gray-400 rounded-xl w-full h-[300px] flex items-center justify-center cursor-pointer"
+                  htmlFor="picture">
+                  {preview ? (
+                    <Image src={preview} width={200} height={200} alt="Img" />
+                  ) : (
+                    <ImageUp className="text-gray-400" size={28} />
+                  )}
+                </FieldLabel>
+                {preview && (
+                  <Button
+                    onClick={() => {
+                      setUploadFile(null);
+                      setPreview(null);
+
+                      if (inputRef.current) {
+                        inputRef.current.value = '';
+                      }
+                    }}
+                    className="mt-2 cursor-pointer">
+                    Очистить
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div
+              className={cn(
+                'w-full md:w-100 mt-5 overflow-hidden transition-all duration-300',
+                !tabs ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none',
+              )}>
+              <SelectCategory setCategories={setCategories} />
+
+              <SelectDesign
+                setSelectPrint={setSelectPrint}
+                selectPrint={selectPrint}
+                filtredDesigns={filtredDesigns}
+              />
             </div>
           </div>
 
           {/* RIGHT */}
           <div className="mt-[200px] md:mt-[0px] mx-auto bg-[radial-gradient(rgba(0,0,0,0.2)_1px,transparent_1px)] bg-size-[20px_20px] relative w-full md:w-[50%] flex items-center justify-center pt-5">
             <div className="relative w-full max-w-[320px] md:max-w-100">
-              <div className="flex justify-around mb-10">
-                <Button
-                  onClick={() => setIsBack(false)}
-                  className="h-[40px] cursor-pointer"
-                  variant={isBack == false ? 'default' : 'outline'}>
-                  Передняя часть
-                </Button>
-                <Button
-                  onClick={() => setIsBack(true)}
-                  className="h-[40px] cursor-pointer"
-                  variant={isBack == true ? 'default' : 'outline'}>
-                  Задняя часть
-                </Button>
-              </div>
+              <SelectBackFornt isBack={isBack} setIsBack={setIsBack} />
               <div className="card-container">
+                {preview && (
+                  <CanvaImage
+                    inputRef={inputRef}
+                    preview={preview}
+                    setPreview={setPreview}
+                    setUpload={setUploadFile}
+                    position={position}
+                    setPosition={setPosition}
+                    isActiveResize={isActiveResize}
+                    setIsActiveResize={setIsActiveResize}
+                    ref={ref}
+                  />
+                )}
                 <div className={`card ${isBack ? 'flipped' : ''}`}>
                   <div>
-                    <Image
-                      className="w-full mb-5 absolute"
-                      src={selectedPrint?.image || ''}
-                      alt=""
-                      width={500}
-                      height={500}
-                    />
+                    {!tabs && (
+                      <Image
+                        className="w-full mb-5 absolute"
+                        src={selectedPrint?.image || ''}
+                        alt=""
+                        width={500}
+                        height={500}
+                      />
+                    )}
 
                     <Image
                       className="w-full mb-5"
