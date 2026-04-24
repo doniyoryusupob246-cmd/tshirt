@@ -4,18 +4,19 @@ import { Container } from './container';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import { Check, Grip, ImageUp, Trash, X } from 'lucide-react';
+import { ImageUp } from 'lucide-react';
 import { shirt } from '@/data/tshirt';
 import { designs } from '@/data/designs';
 
 import { DialogOrder } from './dialog-order';
 import { SelectCategory } from './select-category';
 import { SelectDesign } from './select-design';
-import { Rnd } from 'react-rnd';
 import { SelectBackFornt } from './select-back-fornt';
 import { CanvaImage } from './canva-image';
 import { Input } from '../ui/input';
 import { FieldLabel } from '../ui/field';
+import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 interface Props {
   className?: string;
 }
@@ -43,6 +44,8 @@ const size = ['S', 'M', 'L', 'XL', 'XXL'];
 export const Constructor: React.FC<Props> = ({ className }) => {
   const ref = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const designRef = React.useRef<HTMLDivElement>(null);
+
   const [selectPrint, setSelectPrint] = React.useState<string>(designs[1].id);
   const [selectColor, setSelectColor] = React.useState(shirt[0].id);
 
@@ -54,11 +57,14 @@ export const Constructor: React.FC<Props> = ({ className }) => {
   const [isActiveResize, setIsActiveResize] = React.useState(false);
 
   const [position, setPosition] = React.useState({
-    x: 150,
-    y: 150,
-    width: 80,
-    height: 80,
+    x: 0.3,
+    y: 0.25,
+    width: 0.4,
+    height: 0.4,
   });
+
+  const [screenshotUrl, setScreenshotUrl] = React.useState<string | null>(null);
+  const [isCapturing, setIsCapturing] = React.useState(false);
 
   const [tabs, setTabs] = React.useState(false);
   const selectedPrint = designs.find((d) => d.id === selectPrint);
@@ -68,18 +74,32 @@ export const Constructor: React.FC<Props> = ({ className }) => {
     (item) => item.category === categories && item.allowedColors.includes(selectColor),
   );
 
+  const handleCapture = async () => {
+    if (!designRef.current) return;
+    setIsCapturing(true);
+    try {
+      const dataUrl = await toPng(designRef.current, {
+        cacheBust: true,
+        // backgroundColor: null,
+      });
+      setScreenshotUrl(dataUrl);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
   React.useEffect(() => {
     if (!uploadFile) {
       setPreview(null);
       return;
     }
 
-    const url = URL.createObjectURL(uploadFile);
-    setPreview(url);
-
-    return () => {
-      URL.revokeObjectURL(url);
+    const render = new FileReader();
+    render.onload = (e) => {
+      setPreview(e.target?.result as string);
     };
+
+    render.readAsDataURL(uploadFile);
   }, [uploadFile]);
 
   return (
@@ -161,9 +181,10 @@ export const Constructor: React.FC<Props> = ({ className }) => {
           <div className="mt-[200px] md:mt-[0px] mx-auto bg-[radial-gradient(rgba(0,0,0,0.2)_1px,transparent_1px)] bg-size-[20px_20px] relative w-full md:w-[50%] flex items-center justify-center pt-5">
             <div className="relative w-full max-w-[320px] md:max-w-100">
               <SelectBackFornt isBack={isBack} setIsBack={setIsBack} />
-              <div className="card-container">
+              <div ref={designRef} className="card-container">
                 {preview && (
                   <CanvaImage
+                    containerRef={designRef}
                     inputRef={inputRef}
                     preview={preview}
                     setPreview={setPreview}
@@ -197,13 +218,15 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                   </div>
 
                   <div className="card-face back">
-                    <Image
-                      className="w-full mb-5 absolute"
-                      src={selectedPrint?.image || ''}
-                      alt=""
-                      width={500}
-                      height={500}
-                    />
+                    {!tabs && (
+                      <Image
+                        className="w-full mb-5 absolute"
+                        src={selectedPrint?.image || ''}
+                        alt=""
+                        width={500}
+                        height={500}
+                      />
+                    )}
                     <Image src={selectedColor?.back || ''} alt="" width={500} height={500} />
                   </div>
                 </div>
@@ -260,10 +283,15 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                   </div>
 
                   <DialogOrder
+                    preview={preview}
+                    position={position}
                     selectedPrint={selectedPrint ?? null}
                     selectedColor={selectedColor ?? null}
                     selectBack={isBack}
                     selectSize={selectSize}
+                    screenshotUrl={screenshotUrl}
+                    isCapturing={isCapturing}
+                    onCapture={handleCapture}
                   />
                 </div>
               </div>

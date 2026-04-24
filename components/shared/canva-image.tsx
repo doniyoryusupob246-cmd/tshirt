@@ -25,6 +25,7 @@ interface Props {
   };
   inputRef: React.RefObject<HTMLInputElement | null>;
   ref: React.RefObject<HTMLDivElement | null>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const Handle = () => {
@@ -45,7 +46,33 @@ export const CanvaImage: React.FC<Props> = ({
   ref,
   inputRef,
   preview,
+  containerRef,
 }) => {
+  const [parentSize, setParentSize] = React.useState({ width: 0, height: 0 });
+
+  React.useEffect(() => {
+    if (!containerRef.current) return;
+
+    const updateSize = () => {
+      setParentSize({
+        width: containerRef.current!.offsetWidth,
+        height: containerRef.current!.offsetHeight,
+      });
+    };
+
+    updateSize();
+
+    const observer = new ResizeObserver(updateSize);
+    observer.observe(containerRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const widthPx = position.width * parentSize.width;
+  const heightPx = position.height * parentSize.height;
+  const xPx = position.x * parentSize.width;
+  const yPx = position.y * parentSize.height;
+
   React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -62,8 +89,8 @@ export const CanvaImage: React.FC<Props> = ({
     <Rnd
       onMouseDown={() => setIsActiveResize(true)}
       className={cn('z-50 border', isActiveResize ? 'border-[#2e7eff]' : 'border-transparent')}
-      size={{ width: position.width, height: position.height }}
-      position={{ x: position.x, y: position.y }}
+      size={{ width: widthPx, height: heightPx }}
+      position={{ x: xPx, y: yPx }}
       lockAspectRatio
       bounds="parent"
       resizeHandleComponent={
@@ -79,15 +106,16 @@ export const CanvaImage: React.FC<Props> = ({
       onDragStop={(e, d) => {
         setPosition((prev: Position) => ({
           ...prev,
-          x: d.x,
-          y: d.y,
+          x: d.x / parentSize.width,
+          y: d.y / parentSize.height,
         }));
       }}
       onResizeStop={(e, direction, ref, delta, pos) => {
         setPosition({
-          width: parseInt(ref.style.width),
-          height: parseInt(ref.style.height),
-          ...pos,
+          width: ref.offsetWidth / parentSize.width,
+          height: ref.offsetHeight / parentSize.height,
+          x: pos.x / parentSize.width,
+          y: pos.y / parentSize.height,
         });
       }}>
       <div ref={ref} className="relative w-full h-full">
