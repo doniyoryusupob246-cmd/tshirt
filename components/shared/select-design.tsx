@@ -6,18 +6,12 @@ import { cn } from '@/lib/utils';
 import { Print } from './constructor';
 
 interface Props {
-  className?: string;
   filtredDesigns: Print[];
   selectPrint: string;
   setSelectPrint: (id: string) => void;
 }
 
-export const SelectDesign: React.FC<Props> = ({
-  setSelectPrint,
-  selectPrint,
-  filtredDesigns,
-  className,
-}) => {
+export const SelectDesign: React.FC<Props> = ({ setSelectPrint, selectPrint, filtredDesigns }) => {
   return (
     <div className="scrollbar gap-3 flex flex-wrap justify-between h-100 overflow-y-scroll">
       {filtredDesigns.map((item) => (
@@ -29,7 +23,7 @@ export const SelectDesign: React.FC<Props> = ({
           )}
 
           <Button
-            onClick={() => setSelectPrint(item.id)}
+            onClick={() => setSelectPrint(item.id === selectPrint ? '' : item.id)}
             className={cn(
               'lg:w-30 lg:h-30 w-[90px] h-[90px]',
               item.id === selectPrint && 'border border-[#a7a7a7]',

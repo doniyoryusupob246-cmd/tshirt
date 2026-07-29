@@ -183,3 +183,119 @@ body {
 .back {
   transform: rotateY(180deg);
 }
+
+.text-layer-rnd {
+  backface-visibility: hidden;
+}
+
+/* ---------- LANDING ---------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+.font-serif {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+/* бегущая строка */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-x 32s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: marquee-x 60s linear infinite;
+}
+
+/* медленное «дыхание» градиентного пятна за героем */
+@keyframes aurora {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(4%, -6%, 0) scale(1.15);
+    opacity: 0.8;
+  }
+}
+
+.animate-aurora {
+  animation: aurora 14s ease-in-out infinite;
+}
+
+/* плавное всплытие для героя (без JS) */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* индикатор скролла */
+@keyframes scroll-hint {
+  0% {
+    transform: translateY(-60%);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(60%);
+    opacity: 0;
+  }
+}
+
+.animate-scroll-hint {
+  animation: scroll-hint 2s ease-in-out infinite;
+}
+
+/* мягкое свечение под карточками */
+.card-glow::after {
+  content: '';
+  position: absolute;
+  inset: auto 10% -30% 10%;
+  height: 60%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18), transparent 70%);
+  filter: blur(28px);
+  z-index: -1;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+.card-glow:hover::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-aurora,
+  .animate-rise,
+  .animate-scroll-hint {
+    animation: none;
+  }
+}

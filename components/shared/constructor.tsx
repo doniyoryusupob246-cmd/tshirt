@@ -4,19 +4,27 @@ import { Container } from './container';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { Button } from '../ui/button';
-import { ImageUp } from 'lucide-react';
+import { ImageUp, Loader2, Plus, Trash2 } from 'lucide-react';
 import { shirt } from '@/data/tshirt';
 import { designs } from '@/data/designs';
-
+import { Shirt3DView } from './shirt-3d-view';
 import { DialogOrder } from './dialog-order';
 import { SelectCategory } from './select-category';
 import { SelectDesign } from './select-design';
 import { SelectBackFornt } from './select-back-fornt';
 import { CanvaImage } from './canva-image';
+import { TextLayerItem, type TextLayerData, type TextLayerPosition } from './text-layer';
 import { Input } from '../ui/input';
 import { FieldLabel } from '../ui/field';
-import html2canvas from 'html2canvas';
-import { toPng } from 'html-to-image';
+import { processImageFile, MAX_IMAGE_SIZE_MB } from '@/lib/image';
+import { FONTS, DEFAULT_FONT_ID } from '@/lib/fonts';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 interface Props {
   className?: string;
 }
@@ -46,15 +54,24 @@ export const Constructor: React.FC<Props> = ({ className }) => {
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const designRef = React.useRef<HTMLDivElement>(null);
 
-  const [selectPrint, setSelectPrint] = React.useState<string>(designs[1].id);
+  const [selectPrintFront, setSelectPrintFront] = React.useState<string>('');
+  const [selectPrintBack, setSelectPrintBack] = React.useState<string>('');
   const [selectColor, setSelectColor] = React.useState(shirt[0].id);
+  const [is3D, setIs3D] = React.useState(false);
 
   const [selectSize, setSelectSize] = React.useState(size[0]);
   const [categories, setCategories] = React.useState<string>('games');
-  const [uploadFile, setUploadFile] = React.useState<File | null>(null);
   const [preview, setPreview] = React.useState<string | null>(null);
+  const [uploadError, setUploadError] = React.useState<string | null>(null);
+  const [isProcessingUpload, setIsProcessingUpload] = React.useState(false);
+  const [isDragging, setIsDragging] = React.useState(false);
   const [isBack, setIsBack] = React.useState(false);
+  const [hasBack, setHasBack] = React.useState(false);
   const [isActiveResize, setIsActiveResize] = React.useState(false);
+
+  const [textLayersFront, setTextLayersFront] = React.useState<TextLayerData[]>([]);
+  const [textLayersBack, setTextLayersBack] = React.useState<TextLayerData[]>([]);
+  const [activeTextId, setActiveTextId] = React.useState<string | null>(null);
 
   const [position, setPosition] = React.useState({
     x: 0.3,
@@ -63,44 +80,96 @@ export const Constructor: React.FC<Props> = ({ className }) => {
     height: 0.4,
   });
 
-  const [screenshotUrl, setScreenshotUrl] = React.useState<string | null>(null);
-  const [isCapturing, setIsCapturing] = React.useState(false);
-
   const [tabs, setTabs] = React.useState(false);
-  const selectedPrint = designs.find((d) => d.id === selectPrint);
+  const selectedPrintFront = designs.find((d) => d.id === selectPrintFront);
+  const selectedPrintBack = designs.find((d) => d.id === selectPrintBack);
   const selectedColor = shirt.find((s) => s.id === selectColor);
-
+  const activePrintFront =
+    selectedPrintFront && selectedPrintFront.allowedColors.includes(selectColor)
+      ? selectedPrintFront
+      : null;
+  const activePrintBack =
+    selectedPrintBack && selectedPrintBack.allowedColors.includes(selectColor)
+      ? selectedPrintBack
+      : null;
   const filtredDesigns = designs.filter(
     (item) => item.category === categories && item.allowedColors.includes(selectColor),
   );
 
-  const handleCapture = async () => {
-    if (!designRef.current) return;
-    setIsCapturing(true);
-    try {
-      const dataUrl = await toPng(designRef.current, {
-        cacheBust: true,
-        // backgroundColor: null,
-      });
-      setScreenshotUrl(dataUrl);
-    } finally {
-      setIsCapturing(false);
+  const handleColorChange = (colorId: string) => {
+    setSelectColor(colorId);
+
+    // чиним только УЖЕ выбранный принт, если он стал недопустим для нового
+    // цвета — но не назначаем принт «из ниоткуда», если сторона пустая
+    if (selectPrintFront && !selectedPrintFront?.allowedColors.includes(colorId)) {
+      const fallback = designs.find(
+        (item) => item.category === categories && item.allowedColors.includes(colorId),
+      );
+      setSelectPrintFront(fallback ? fallback.id : '');
+    }
+
+    if (selectPrintBack && !selectedPrintBack?.allowedColors.includes(colorId)) {
+      const fallback = designs.find(
+        (item) => item.category === categories && item.allowedColors.includes(colorId),
+      );
+      setSelectPrintBack(fallback ? fallback.id : '');
     }
   };
 
-  React.useEffect(() => {
-    if (!uploadFile) {
+  const handleFile = async (file: File | null) => {
+    if (!file) {
       setPreview(null);
+      setUploadError(null);
       return;
     }
 
-    const render = new FileReader();
-    render.onload = (e) => {
-      setPreview(e.target?.result as string);
-    };
+    setUploadError(null);
+    setIsProcessingUpload(true);
+    try {
+      const dataUrl = await processImageFile(file);
+      setPreview(dataUrl);
+    } catch (err) {
+      setPreview(null);
+      setUploadError(err instanceof Error ? err.message : 'Не удалось загрузить файл');
+    } finally {
+      setIsProcessingUpload(false);
+    }
+  };
 
-    render.readAsDataURL(uploadFile);
-  }, [uploadFile]);
+  const activeTextLayers = isBack ? textLayersBack : textLayersFront;
+  const setActiveTextLayers = isBack ? setTextLayersBack : setTextLayersFront;
+
+  const addTextLayer = () => {
+    const newLayer: TextLayerData = {
+      id: crypto.randomUUID(),
+      content: 'Текст',
+      font: DEFAULT_FONT_ID,
+      color: '#000000',
+      position: { x: 0.3, y: 0.4, width: 0.4, height: 0.15 },
+    };
+    setActiveTextLayers((prev) => [...prev, newLayer]);
+    setActiveTextId(newLayer.id);
+  };
+
+  const updateTextLayer = (id: string, patch: Partial<TextLayerData>) => {
+    setActiveTextLayers((prev) => prev.map((t) => (t.id === id ? { ...t, ...patch } : t)));
+  };
+
+  const removeTextLayer = (id: string) => {
+    setActiveTextLayers((prev) => prev.filter((t) => t.id !== id));
+    if (activeTextId === id) setActiveTextId(null);
+  };
+
+  React.useEffect(() => {
+    function handleClickOutsideText(e: MouseEvent) {
+      if (!(e.target as HTMLElement).closest('.text-layer-rnd')) {
+        setActiveTextId(null);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutsideText);
+    return () => document.removeEventListener('mousedown', handleClickOutsideText);
+  }, []);
 
   return (
     <div className={cn('mt-10', className)}>
@@ -121,6 +190,14 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                   {tabs ? 'Назад' : 'Создать дизайн'}
                 </Button>
               </div>
+              <div>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={() => setIs3D((v) => !v)}>
+                  {is3D ? '2D режим' : '3D просмотр'}
+                </Button>
+              </div>
             </div>
 
             <div
@@ -131,34 +208,134 @@ export const Constructor: React.FC<Props> = ({ className }) => {
               <div className="w-full md:w-100">
                 <Input
                   ref={inputRef}
-                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  onChange={(e) => handleFile(e.target.files?.[0] || null)}
                   className="hidden"
                   id="picture"
                   type="file"
+                  accept="image/*"
                 />
                 <FieldLabel
-                  className="border border-gray-400 rounded-xl w-full h-[300px] flex items-center justify-center cursor-pointer"
-                  htmlFor="picture">
-                  {preview ? (
-                    <Image src={preview} width={200} height={200} alt="Img" />
+                  className={cn(
+                    'border rounded-xl w-full h-[300px] flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors px-4 text-center',
+                    isDragging ? 'border-blue-400 bg-blue-50' : 'border-gray-400',
+                  )}
+                  htmlFor="picture"
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setIsDragging(true);
+                  }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) handleFile(file);
+                  }}>
+                  {isProcessingUpload ? (
+                    <Loader2 className="animate-spin text-gray-400" size={28} />
+                  ) : preview ? (
+                    <Image
+                      src={preview}
+                      width={200}
+                      height={200}
+                      alt="Предпросмотр загруженного дизайна"
+                      className="object-contain max-h-[260px] w-auto"
+                    />
                   ) : (
-                    <ImageUp className="text-gray-400" size={28} />
+                    <>
+                      <ImageUp className="text-gray-400" size={28} />
+                      <p className="text-xs text-gray-400">
+                        Перетащите изображение сюда или нажмите, чтобы выбрать
+                        <br />
+                        (до {MAX_IMAGE_SIZE_MB} МБ)
+                      </p>
+                    </>
                   )}
                 </FieldLabel>
-                {preview && (
-                  <Button
-                    onClick={() => {
-                      setUploadFile(null);
-                      setPreview(null);
 
-                      if (inputRef.current) {
-                        inputRef.current.value = '';
-                      }
-                    }}
-                    className="mt-2 cursor-pointer">
-                    Очистить
-                  </Button>
+                {uploadError && <p className="text-xs text-red-500 mt-2">{uploadError}</p>}
+
+                {preview && !isProcessingUpload && (
+                  <>
+                    <p className="text-xs text-gray-500 mt-2">
+                      Перетащите картинку на футболке или измените размер, потянув за уголок
+                    </p>
+                    <Button
+                      onClick={() => {
+                        handleFile(null);
+                        if (inputRef.current) {
+                          inputRef.current.value = '';
+                        }
+                      }}
+                      className="mt-2 cursor-pointer">
+                      Очистить
+                    </Button>
+                  </>
                 )}
+              </div>
+
+              <div className="w-full md:w-100 mt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[14px] font-medium">
+                    Текст для: <b>{isBack ? 'задней части' : 'передней части'}</b>
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer h-[32px] text-xs"
+                    onClick={addTextLayer}>
+                    <Plus size={14} className="mr-1" />
+                    Добавить текст
+                  </Button>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  {activeTextLayers.map((layer) => (
+                    <div
+                      key={layer.id}
+                      className={cn(
+                        'border rounded-lg p-3 flex flex-col gap-2',
+                        activeTextId === layer.id ? 'border-blue-400' : 'border-gray-200',
+                      )}
+                      onClick={() => setActiveTextId(layer.id)}>
+                      <Input
+                        value={layer.content}
+                        onChange={(e) => updateTextLayer(layer.id, { content: e.target.value })}
+                        placeholder="Введите текст"
+                      />
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={layer.font}
+                          onValueChange={(font) => updateTextLayer(layer.id, { font })}>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {FONTS.map((f) => (
+                              <SelectItem key={f.id} value={f.id}>
+                                <span style={{ fontFamily: f.fontFamily }}>{f.label}</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+
+                        <input
+                          type="color"
+                          value={layer.color}
+                          onChange={(e) => updateTextLayer(layer.id, { color: e.target.value })}
+                          className="w-9 h-9 rounded cursor-pointer border border-gray-300 shrink-0"
+                          title="Цвет текста"
+                        />
+
+                        <Button
+                          variant="outline"
+                          className="cursor-pointer h-9 w-9 p-0 text-red-500 shrink-0"
+                          onClick={() => removeTextLayer(layer.id)}>
+                          <Trash2 size={14} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -169,9 +346,13 @@ export const Constructor: React.FC<Props> = ({ className }) => {
               )}>
               <SelectCategory setCategories={setCategories} />
 
+              <p className="text-[13px] text-[#8a8a8a] mb-2">
+                Дизайн для: <b>{isBack ? 'задней части' : 'передней части'}</b>
+              </p>
+
               <SelectDesign
-                setSelectPrint={setSelectPrint}
-                selectPrint={selectPrint}
+                setSelectPrint={isBack ? setSelectPrintBack : setSelectPrintFront}
+                selectPrint={isBack ? selectPrintBack : selectPrintFront}
                 filtredDesigns={filtredDesigns}
               />
             </div>
@@ -180,57 +361,107 @@ export const Constructor: React.FC<Props> = ({ className }) => {
           {/* RIGHT */}
           <div className="mt-[200px] md:mt-[0px] mx-auto bg-[radial-gradient(rgba(0,0,0,0.2)_1px,transparent_1px)] bg-size-[20px_20px] relative w-full md:w-[50%] flex items-center justify-center pt-5">
             <div className="relative w-full max-w-[320px] md:max-w-100">
-              <SelectBackFornt isBack={isBack} setIsBack={setIsBack} />
-              <div ref={designRef} className="card-container">
-                {preview && (
-                  <CanvaImage
-                    containerRef={designRef}
-                    inputRef={inputRef}
-                    preview={preview}
-                    setPreview={setPreview}
-                    setUpload={setUploadFile}
-                    position={position}
-                    setPosition={setPosition}
-                    isActiveResize={isActiveResize}
-                    setIsActiveResize={setIsActiveResize}
-                    ref={ref}
-                  />
-                )}
-                <div className={`card ${isBack ? 'flipped' : ''}`}>
-                  <div>
-                    {!tabs && (
-                      <Image
-                        className="w-full mb-5 absolute"
-                        src={selectedPrint?.image || ''}
-                        alt=""
-                        width={500}
-                        height={500}
-                      />
-                    )}
-
-                    <Image
-                      className="w-full mb-5"
-                      src={selectedColor?.img || ''}
-                      alt=""
-                      width={500}
-                      height={500}
+              <SelectBackFornt
+                isBack={isBack}
+                setIsBack={setIsBack}
+                hasBack={hasBack}
+                setHasBack={setHasBack}
+              />
+              {is3D ? (
+                <Shirt3DView
+                  color={selectedColor?.color ?? '#ffffff'}
+                  decalUrl={preview ?? selectedPrintFront?.image ?? null}
+                />
+              ) : (
+                <div ref={designRef} className="card-container">
+                  {preview && (
+                    <CanvaImage
+                      containerRef={designRef}
+                      inputRef={inputRef}
+                      preview={preview}
+                      setPreview={setPreview}
+                      position={position}
+                      setPosition={setPosition}
+                      isActiveResize={isActiveResize}
+                      setIsActiveResize={setIsActiveResize}
+                      ref={ref}
                     />
-                  </div>
+                  )}
+                  <div className={`card ${isBack ? 'flipped' : ''}`}>
+                    <div>
+                      {!tabs && activePrintFront && (
+                        <Image
+                          className="w-full mb-5 absolute"
+                          src={activePrintFront.image}
+                          alt=""
+                          width={500}
+                          height={500}
+                        />
+                      )}
 
-                  <div className="card-face back">
-                    {!tabs && (
                       <Image
-                        className="w-full mb-5 absolute"
-                        src={selectedPrint?.image || ''}
+                        className="w-full mb-5"
+                        src={selectedColor?.img || ''}
                         alt=""
                         width={500}
                         height={500}
                       />
-                    )}
-                    <Image src={selectedColor?.back || ''} alt="" width={500} height={500} />
+
+                      {textLayersFront.map((layer) => (
+                        <TextLayerItem
+                          key={layer.id}
+                          layer={layer}
+                          containerRef={designRef}
+                          isActive={activeTextId === layer.id}
+                          onActivate={() => setActiveTextId(layer.id)}
+                          onChangePosition={(position: TextLayerPosition) =>
+                            setTextLayersFront((prev) =>
+                              prev.map((t) => (t.id === layer.id ? { ...t, position } : t)),
+                            )
+                          }
+                          onRemove={() => {
+                            setTextLayersFront((prev) => prev.filter((t) => t.id !== layer.id));
+                            setActiveTextId(null);
+                          }}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="card-face back">
+                      {hasBack && !tabs && activePrintBack && (
+                        <Image
+                          className="w-full mb-5 absolute"
+                          src={activePrintBack.image}
+                          alt=""
+                          width={500}
+                          height={500}
+                        />
+                      )}
+
+                      {hasBack &&
+                        textLayersBack.map((layer) => (
+                          <TextLayerItem
+                            key={layer.id}
+                            layer={layer}
+                            containerRef={designRef}
+                            isActive={activeTextId === layer.id}
+                            onActivate={() => setActiveTextId(layer.id)}
+                            onChangePosition={(position: TextLayerPosition) =>
+                              setTextLayersBack((prev) =>
+                                prev.map((t) => (t.id === layer.id ? { ...t, position } : t)),
+                              )
+                            }
+                            onRemove={() => {
+                              setTextLayersBack((prev) => prev.filter((t) => t.id !== layer.id));
+                              setActiveTextId(null);
+                            }}
+                          />
+                        ))}
+                      <Image src={selectedColor?.back || ''} alt="" width={500} height={500} />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* BOTTOM PANEL */}
@@ -244,7 +475,7 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                     {shirt.map((color) => (
                       <Button
                         key={color.id}
-                        onClick={() => setSelectColor(color.id)}
+                        onClick={() => handleColorChange(color.id)}
                         className="cursor-pointer relative w-6.25 h-6.25 rounded-full
                           after:content-[''] after:absolute after:inset-0
                           after:rounded-full after:border-2
@@ -283,15 +514,15 @@ export const Constructor: React.FC<Props> = ({ className }) => {
                   </div>
 
                   <DialogOrder
+                    selectedColor={selectedColor ?? null}
+                    activePrintFront={activePrintFront}
+                    activePrintBack={activePrintBack}
                     preview={preview}
                     position={position}
-                    selectedPrint={selectedPrint ?? null}
-                    selectedColor={selectedColor ?? null}
-                    selectBack={isBack}
+                    textLayersFront={textLayersFront}
+                    textLayersBack={textLayersBack}
+                    hasBack={hasBack}
                     selectSize={selectSize}
-                    screenshotUrl={screenshotUrl}
-                    isCapturing={isCapturing}
-                    onCapture={handleCapture}
                   />
                 </div>
               </div>

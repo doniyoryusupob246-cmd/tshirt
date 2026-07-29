@@ -10,12 +10,10 @@ type Position = {
   height: number;
 };
 interface Props {
-  className?: string;
   setIsActiveResize: (bool: boolean) => void;
   isActiveResize: boolean;
   setPosition: React.Dispatch<React.SetStateAction<Position>>;
   setPreview: (value: string | null) => void;
-  setUpload: (value: File | null) => void;
   preview: string | null;
   position: {
     x: number;
@@ -42,7 +40,6 @@ export const CanvaImage: React.FC<Props> = ({
   setIsActiveResize,
   isActiveResize,
   setPreview,
-  setUpload,
   ref,
   inputRef,
   preview,
@@ -66,7 +63,7 @@ export const CanvaImage: React.FC<Props> = ({
     observer.observe(containerRef.current);
 
     return () => observer.disconnect();
-  }, []);
+  }, [containerRef]);
 
   const widthPx = position.width * parentSize.width;
   const heightPx = position.height * parentSize.height;
@@ -84,7 +81,7 @@ export const CanvaImage: React.FC<Props> = ({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [ref, setIsActiveResize]);
   return (
     <Rnd
       onMouseDown={() => setIsActiveResize(true)}
@@ -124,7 +121,6 @@ export const CanvaImage: React.FC<Props> = ({
             <Trash
               onClick={() => {
                 setPreview(null);
-                setUpload(null);
                 if (inputRef.current) {
                   inputRef.current.value = '';
                 }

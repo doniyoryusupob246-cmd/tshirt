@@ -9,11 +9,10 @@ import {
 } from '../ui/select';
 
 interface Props {
-  className?: string;
   setCategories: (value: string) => void;
 }
 
-export const SelectCategory: React.FC<Props> = ({ setCategories, className }) => {
+export const SelectCategory: React.FC<Props> = ({ setCategories }) => {
   return (
     <div className="mb-5">
       <p className="text-[14px] mb-2">Выберите категорию:</p>

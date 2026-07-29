@@ -5,19 +5,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Loader2, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
 import { Button } from '../ui/button';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 import { Color, Print } from './constructor';
+import { FONTS, DEFAULT_FONT_ID } from '@/lib/fonts';
+import type { TextLayerData } from './text-layer';
 import React from 'react';
 interface Props {
   selectedColor: Color | null;
-  selectedPrint: Print | null;
-  selectSize: string;
-  selectBack: boolean;
+  activePrintFront: Print | null;
+  activePrintBack: Print | null;
   preview: string | null;
   position: {
     x: number;
@@ -25,56 +27,95 @@ interface Props {
     width: number;
     height: number;
   };
-  screenshotUrl: string | null;
-  isCapturing: boolean;
-  onCapture: () => Promise<void>;
+  textLayersFront: TextLayerData[];
+  textLayersBack: TextLayerData[];
+  selectSize: string;
+  hasBack: boolean;
 }
-export const DialogOrder: React.FC<Props> = ({
-  selectBack,
-  selectedColor,
-  selectedPrint,
-  selectSize,
-  position,
+
+type SidePreviewProps = {
+  label: string;
+  bgImage: string;
+  preview: string | null;
+  activePrint: Print | null;
+  position: Props['position'];
+  textLayers: TextLayerData[];
+  compact: boolean;
+};
+
+const SidePreview: React.FC<SidePreviewProps> = ({
+  label,
+  bgImage,
   preview,
-  screenshotUrl,
-  isCapturing,
-  onCapture,
+  activePrint,
+  position,
+  textLayers,
+  compact,
+}) => (
+  <div className="flex flex-col items-center gap-2">
+    <h2 className="text-sm font-medium">{label}</h2>
+    <div
+      className={cn(
+        'relative flex items-center justify-center',
+        compact ? 'w-[160px] h-[180px]' : 'w-[280px] h-[300px]',
+      )}>
+      <Image src={bgImage || ''} alt="" fill className="object-contain" />
+
+      {preview ? (
+        <div
+          className="absolute"
+          style={{
+            left: `${position.x * 100}%`,
+            top: `${position.y * 100}%`,
+            width: `${position.width * 100}%`,
+            height: `${position.height * 100}%`,
+          }}>
+          <Image src={preview} alt="" fill className="object-contain" unoptimized />
+        </div>
+      ) : (
+        activePrint && (
+          <Image src={activePrint.image} alt="" fill className="absolute object-contain" />
+        )
+      )}
+
+      {textLayers.map((layer) => {
+        const font = FONTS.find((f) => f.id === layer.font) ?? FONTS.find((f) => f.id === DEFAULT_FONT_ID)!;
+        return (
+          <div
+            key={layer.id}
+            className="absolute flex items-center justify-center text-center break-words leading-tight overflow-hidden"
+            style={{
+              left: `${layer.position.x * 100}%`,
+              top: `${layer.position.y * 100}%`,
+              width: `${layer.position.width * 100}%`,
+              height: `${layer.position.height * 100}%`,
+              fontFamily: font.fontFamily,
+              color: layer.color,
+              fontSize: `${(compact ? 160 : 280) * layer.position.height * 0.6}px`,
+            }}>
+            {layer.content}
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
+export const DialogOrder: React.FC<Props> = ({
+  selectedColor,
+  activePrintFront,
+  activePrintBack,
+  preview,
+  position,
+  textLayersFront,
+  textLayersBack,
+  hasBack,
+  selectSize,
 }) => {
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const [size, setSize] = React.useState({ width: 0, height: 0 });
   const [open, setOpen] = React.useState(false);
-  const handleOpen = async (value: boolean) => {
-    setOpen(value);
-    if (value) {
-      await onCapture();
-    }
-  };
-  React.useEffect(() => {
-    if (!open) return;
-    if (!containerRef.current) return;
 
-    const update = () => {
-      setSize({
-        width: containerRef.current!.offsetWidth,
-        height: containerRef.current!.offsetHeight,
-      });
-    };
-
-    update();
-
-    // const observer = new ResizeObserver(update);
-    // observer.observe(containerRef.current);
-
-    // return () => observer.disconnect();
-  }, [open]);
-
-  const widthPx = position.width * size.width;
-  const heightPx = position.height * size.height;
-  const xPx = position.x * size.width;
-  const yPx = position.y * size.height;
-  console.log('kjghghg', size);
   return (
-    <Dialog open={open} onOpenChange={handleOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="flex items-center justify-center rounded-xl gap-2 bg-white w-[150px] h-[50px] cursor-pointer">
         Заказать
         <ShoppingCart size={15} />
@@ -122,85 +163,28 @@ export const DialogOrder: React.FC<Props> = ({
             </div>
 
             {/* PREVIEW */}
-            <div className="w-full md:w-[50%] h-full flex items-center justify-center flex-col">
-              <h2>{selectBack ? 'Задняя часть' : 'Передняя часть'}</h2>
-              {/* <div ref={containerRef} className="relative max-w-[200px] md:max-w-[300px] h-[300px]">
-                {preview && (
-                  <div
-                    className="absolute z-30 "
-                    style={{
-                      width: widthPx,
-                      height: heightPx,
-                      transform: `translate(${xPx}px, ${yPx}px)`,
-                    }}>
-                    <Image
-                      src={preview}
-                      alt=""
-                      width={100}
-                      height={100}
-                      className="object-contain pointer-events-none max-w-[600px]"
-                    />
-                  </div>
-                )}
-                {!preview && (
-                  <Image
-                    className="w-full mb-5 absolute"
-                    src={selectedPrint?.image || ''}
-                    alt=""
-                    width={300}
-                    height={300}
-                  />
-                )}
-
-                <Image
-                  className="w-full mb-5"
-                  src={
-                    selectBack == false
-                      ? selectedColor?.img || '/placeholder.png'
-                      : selectedColor?.back || '/placeholder.png'
-                  }
-                  alt=""
-                  width={300}
-                  height={300}
+            <div className="w-full md:w-[50%] h-full flex items-center justify-center flex-col gap-4">
+              <div className={cn('flex gap-4', !hasBack && 'flex-col items-center')}>
+                <SidePreview
+                  label="Передняя часть"
+                  bgImage={selectedColor?.img ?? ''}
+                  preview={preview}
+                  activePrint={activePrintFront}
+                  position={position}
+                  textLayers={textLayersFront}
+                  compact={hasBack}
                 />
 
-                {isCapturing && (
-                  <div className="flex flex-col items-center gap-2 text-gray-400">
-                    <Loader2 className="animate-spin" size={28} />
-                    <span className="text-sm">Генерация превью...</span>
-                  </div>
-                )}
-
-                {!isCapturing && screenshotUrl && (
-                  <Image src={screenshotUrl} alt="Превью заказа" fill className="object-contain" />
-                )}
-
-                {!isCapturing && !screenshotUrl && (
-                  <p className="text-sm text-gray-400">Нет превью</p>
-                )}
-              </div> */}
-
-              {/* ✅ position: relative + явные размеры обязательны для next/image с fill */}
-              <div className="relative w-[280px] h-[300px] flex items-center justify-center">
-                {isCapturing && (
-                  <div className="flex flex-col items-center gap-2 text-gray-400">
-                    <Loader2 className="animate-spin" size={28} />
-                    <span className="text-sm">Генерация превью...</span>
-                  </div>
-                )}
-
-                {!isCapturing && screenshotUrl && (
-                  <Image
-                    src={screenshotUrl}
-                    alt="Превью заказа"
-                    fill
-                    className="object-contain"
-                    unoptimized
+                {hasBack && (
+                  <SidePreview
+                    label="Задняя часть"
+                    bgImage={selectedColor?.back ?? ''}
+                    preview={preview}
+                    activePrint={activePrintBack}
+                    position={position}
+                    textLayers={textLayersBack}
+                    compact={hasBack}
                   />
-                )}
-
-                {!isCapturing && !screenshotUrl && (
-                  <p className="text-sm text-gray-400">Нет превью</p>
                 )}
               </div>
 
