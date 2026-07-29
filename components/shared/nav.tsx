@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { X } from 'lucide-react';
 import React from 'react';
 import { Container } from './container';
 
@@ -30,6 +31,14 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // блокируем скролл страницы, пока открыто полноэкранное мобильное меню
+  React.useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
 
   // тёмный текст, если шапка не поверх героя или уже проскроллили
   const solid = !overlay || scrolled;
@@ -105,25 +114,33 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
             </button>
           </div>
         </div>
+      </Container>
 
-        {/* MOBILE MENU */}
-        <div
-          className={cn(
-            'md:hidden overflow-hidden transition-all duration-500',
-            open ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0',
-          )}>
-          <nav className="flex flex-col gap-1 pb-4">
-            {LINKS.map((link) => (
+      {/* MOBILE MENU — полноэкранный непрозрачный оверлей, а не выпадашка внутри шапки */}
+      <div
+        className={cn(
+          'fixed inset-0 z-110 bg-neutral-950 transition-opacity duration-300 md:hidden',
+          open ? 'opacity-100' : 'pointer-events-none opacity-0',
+        )}>
+        <Container className="flex h-full flex-col pt-6">
+          <div className="flex items-center justify-between">
+            <span className="font-serif text-[22px] tracking-[0.2em] text-white">ATELIER</span>
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Закрыть меню"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-white">
+              <X size={22} />
+            </button>
+          </div>
+
+          <nav className="flex flex-1 flex-col justify-center gap-2 pb-20">
+            {LINKS.map((link, i) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className={cn(
-                  'rounded-lg py-2.5 text-[15px] tracking-wide transition-colors',
-                  solid
-                    ? 'text-neutral-700 hover:text-neutral-950'
-                    : 'text-white/80 hover:text-white',
-                )}>
+                className="border-b border-white/10 py-4 font-serif text-3xl text-white/85 transition-colors last:border-none hover:text-white"
+                style={{ transitionDelay: open ? `${i * 40}ms` : '0ms' }}>
                 {link.label}
               </Link>
             ))}
@@ -132,15 +149,14 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
               href="/design"
               onClick={() => setOpen(false)}
               className={cn(
-                'mt-3 flex items-center justify-center rounded-full py-3.5 text-[14px] tracking-wide transition-colors sm:hidden',
+                'mt-8 flex items-center justify-center rounded-full bg-white py-4 text-[14px] tracking-wide text-neutral-900',
                 pathname === '/design' && 'pointer-events-none opacity-60',
-                solid ? 'bg-neutral-900 text-white' : 'bg-white text-neutral-900',
               )}>
               Твой дизайн
             </Link>
           </nav>
-        </div>
-      </Container>
+        </Container>
+      </div>
     </header>
   );
 };
