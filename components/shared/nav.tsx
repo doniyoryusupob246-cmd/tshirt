@@ -74,7 +74,7 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
             <Link
               href="/design"
               className={cn(
-                'group relative overflow-hidden rounded-full px-5 py-2.5 text-[13px] tracking-wide transition-all duration-300',
+                'group relative hidden overflow-hidden rounded-full px-5 py-2.5 text-[13px] tracking-wide transition-all duration-300 sm:block',
                 pathname === '/design' && 'pointer-events-none opacity-60',
                 solid
                   ? 'bg-neutral-900 text-white hover:bg-neutral-700'
@@ -110,21 +110,34 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
         <div
           className={cn(
             'md:hidden overflow-hidden transition-all duration-500',
-            open ? 'max-h-64 opacity-100 mt-4' : 'max-h-0 opacity-0',
+            open ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0',
           )}>
-          <nav className="flex flex-col gap-4 pb-3">
+          <nav className="flex flex-col gap-1 pb-4">
             {LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  'text-sm tracking-wide',
-                  solid ? 'text-neutral-700' : 'text-white/80',
+                  'rounded-lg py-2.5 text-[15px] tracking-wide transition-colors',
+                  solid
+                    ? 'text-neutral-700 hover:text-neutral-950'
+                    : 'text-white/80 hover:text-white',
                 )}>
                 {link.label}
               </Link>
             ))}
+
+            <Link
+              href="/design"
+              onClick={() => setOpen(false)}
+              className={cn(
+                'mt-3 flex items-center justify-center rounded-full py-3.5 text-[14px] tracking-wide transition-colors sm:hidden',
+                pathname === '/design' && 'pointer-events-none opacity-60',
+                solid ? 'bg-neutral-900 text-white' : 'bg-white text-neutral-900',
+              )}>
+              Твой дизайн
+            </Link>
           </nav>
         </div>
       </Container>
