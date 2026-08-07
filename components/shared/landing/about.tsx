@@ -4,10 +4,10 @@ import { Container } from '../container';
 import { Reveal } from '../reveal';
 
 const STATS = [
-  { value: '8', suffix: 'лет', label: 'на рынке печати' },
-  { value: '12', suffix: 'тыс.', label: 'изделий отпечатано' },
+  { value: '2', suffix: 'лет', label: 'на рынке печати' },
+  { value: '15', suffix: 'тыс.', label: 'изделий отпечатано' },
   { value: '1–2', suffix: 'дня', label: 'средний срок заказа' },
-  { value: '60', suffix: '+', label: 'брендов доверяют' },
+  { value: '20', suffix: '+', label: 'брендов доверяют' },
 ];
 
 export const About = () => {
@@ -30,8 +30,8 @@ export const About = () => {
             <Reveal delay={120}>
               <div className="mt-10 space-y-5 text-[15px] leading-relaxed text-neutral-600">
                 <p>
-                  ATELIER — небольшая студия, где за каждым заказом стоят живые люди. Мы
-                  подбираем ткань, тестируем печать и следим, чтобы вещь пережила не одну стирку.
+                  TheShirt — небольшая студия, где за каждым заказом стоят живые люди. Мы подбираем
+                  ткань, тестируем печать и следим, чтобы вещь пережила не одну стирку.
                 </p>
                 <p>
                   Работаем и с частными заказами, и с брендами: от единственной футболки в подарок
@@ -45,7 +45,7 @@ export const About = () => {
             <Reveal direction="right">
               <div className="card-glow relative overflow-hidden rounded-[1.5rem]">
                 <Image
-                  src="/tshirt/brown.jpg"
+                  src="/hero_tshirt.png"
                   alt="Печать на футболке"
                   width={1200}
                   height={900}

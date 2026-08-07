@@ -10,11 +10,16 @@ const PLANS = [
     name: 'Одна вещь',
     price: '150 000',
     note: 'за изделие',
-    features: ['Печать с одной стороны', 'Хлопок 190 г/м²', 'Срок 1–2 дня', 'Свой макет или каталог'],
+    features: [
+      'Печать спереди и сзади',
+      'Хлопок 190 г/м²',
+      'Срок 1–2 дня',
+      'Свой макет или каталог',
+    ],
     accent: false,
   },
   {
-    name: 'Двусторонняя',
+    name: 'Одна вещь',
     price: '250 000',
     note: 'за изделие',
     features: [
@@ -28,9 +33,14 @@ const PLANS = [
   },
   {
     name: 'Тираж',
-    price: 'от 90 000',
+    price: 'от 100 000',
     note: 'при заказе 20+',
-    features: ['Скидка от объёма', 'Единый стандарт качества', 'Свои размеры и цвета', 'Персональный менеджер'],
+    features: [
+      'Скидка от объёма',
+      'Единый стандарт качества',
+      'Свои размеры и цвета',
+      'Персональный менеджер',
+    ],
     accent: false,
   },
 ];
@@ -59,7 +69,7 @@ export const Pricing = () => {
                 className={cn(
                   'group relative flex h-full flex-col rounded-[1.5rem] p-8 transition-all duration-500 md:p-10',
                   plan.accent
-                    ? 'bg-neutral-950 text-white shadow-2xl md:-translate-y-4'
+                    ? 'bg-[#690B23] text-white shadow-2xl md:-translate-y-4'
                     : 'border border-black/10 bg-white hover:border-black/25',
                 )}>
                 {plan.accent && (
@@ -110,7 +120,7 @@ export const Pricing = () => {
                     'mt-10 flex items-center justify-center rounded-full py-4 text-[13px] tracking-wide transition-all duration-300',
                     plan.accent
                       ? 'bg-white text-neutral-900 hover:bg-white/90'
-                      : 'border border-black/15 hover:bg-neutral-950 hover:text-white',
+                      : 'border border-black/15 hover:bg-[#690B23] hover:text-white',
                   )}>
                   Оформить
                 </Link>

@@ -12,7 +12,7 @@ const ITEMS = [
 
 export const Marquee = () => {
   return (
-    <div className="relative overflow-hidden border-y border-black/[0.07] bg-neutral-950 py-5 text-white">
+    <div className="relative overflow-hidden border-y border-black/[0.07] bg-[#690B23] py-5 text-white">
       <div className="flex w-max animate-marquee">
         {[0, 1].map((copy) => (
           <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>

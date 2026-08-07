@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-[100svh] flex items-center overflow-hidden bg-neutral-950 text-white">
+    <section className="relative min-h-[100svh] flex items-center overflow-hidden bg-[#690B23] text-white">
       {/* фоновые градиентные пятна */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="animate-aurora absolute -top-1/4 -left-[10%] h-[60vw] w-[60vw] rounded-full bg-[radial-gradient(circle,rgba(120,120,255,0.25),transparent_65%)] blur-3xl" />
@@ -43,8 +43,8 @@ export const Hero = () => {
             <p
               className="animate-rise mt-10 max-w-md text-[15px] leading-relaxed text-white/60"
               style={{ animationDelay: '520ms' }}>
-              Мы превращаем идею в вещь, которую хочется носить. Печать, дизайн и подбор
-              материалов — от одной футболки до тиража для бренда.
+              Мы превращаем идею в вещь, которую хочется носить. Печать, дизайн и подбор материалов
+              — от одной футболки до тиража для бренда.
             </p>
 
             <div
@@ -69,25 +69,15 @@ export const Hero = () => {
             <div
               className="animate-rise relative mx-auto max-w-[420px]"
               style={{ animationDelay: '480ms' }}>
-              <div className="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-white/10 to-transparent blur-2xl" />
-              <div className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.04] backdrop-blur-sm">
+              <div className="relative overflow-hidden rounded-[1.75rem]">
                 <Image
-                  src="/tshirt/black.jpg"
+                  src="/hero_2.png"
                   alt="Футболка с печатью"
                   width={800}
                   height={800}
                   priority
                   className="w-full object-cover"
                 />
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-black/80 to-transparent p-6">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.25em] text-white/50">
-                      Premium cotton
-                    </p>
-                    <p className="mt-1 font-serif text-xl">240 г/м²</p>
-                  </div>
-                  <p className="font-serif text-3xl text-white/90">01</p>
-                </div>
               </div>
             </div>
           </div>

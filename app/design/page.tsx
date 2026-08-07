@@ -4,7 +4,7 @@ import { Footer } from '@/components/shared/footer';
 import { Container } from '@/components/shared/container';
 
 export const metadata = {
-  title: 'Конструктор — ATELIER',
+  title: 'Конструктор — TheShirt',
   description: 'Создайте свой дизайн футболки: принты, свои изображения и текст.',
 };
 

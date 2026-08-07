@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import { Printer, PenTool, Building2, LayoutGrid } from 'lucide-react';
 import { Container } from '../container';
 import { Reveal } from '../reveal';
 import { cn } from '@/lib/utils';
@@ -11,25 +11,25 @@ const SERVICES = [
     num: '01',
     title: 'Печать на футболках',
     text: 'DTF и цифровая печать: точный цвет, мягкий на ощупь принт, стойкий к стиркам.',
-    image: '/design-post/dota-red.jpg',
+    icon: Printer,
   },
   {
     num: '02',
     title: 'Свой дизайн',
     text: 'Загрузите картинку или соберите макет в конструкторе — с текстом, шрифтами и позицией.',
-    image: '/design-post/gta.jpg',
+    icon: PenTool,
   },
   {
     num: '03',
     title: 'Корпоративный мерч',
     text: 'Худи, футболки и аксессуары с айдентикой компании. Работаем с тиражами любого объёма.',
-    image: '/design-post/csgo-gold.jpg',
+    icon: Building2,
   },
   {
     num: '04',
     title: 'Готовые коллекции',
     text: 'Каталог принтов на любой вкус — от игровых до графики. Выбирайте и заказывайте в два клика.',
-    image: '/design-post/mortal-combat-gold.jpg',
+    icon: LayoutGrid,
   },
 ];
 
@@ -37,7 +37,7 @@ export const Services = () => {
   const [active, setActive] = React.useState<number | null>(null);
 
   return (
-    <section id="process" className="relative bg-neutral-950 py-28 text-white md:py-40">
+    <section id="process" className="relative bg-[#690B23] py-28 text-white md:py-40">
       <Container>
         <Reveal>
           <div className="mb-16 flex flex-col justify-between gap-6 md:mb-24 md:flex-row md:items-end">
@@ -62,39 +62,41 @@ export const Services = () => {
                 onMouseEnter={() => setActive(i)}
                 onMouseLeave={() => setActive(null)}
                 className={cn(
-                  'group relative grid grid-cols-12 items-center gap-4 border-t border-white/10 py-8 transition-colors duration-500 md:py-10',
+                  'group relative flex flex-col gap-4 border-t border-white/10 py-8 transition-colors duration-500 md:grid md:grid-cols-12 md:items-center md:gap-4 md:py-10',
                   i === SERVICES.length - 1 && 'border-b',
                 )}>
-                <span className="col-span-2 font-serif text-sm text-white/30 md:col-span-1">
-                  {service.num}
-                </span>
+                <div className="flex items-center gap-4 md:col-span-1 md:flex-col md:items-start">
+                  <div
+                    className={cn(
+                      'relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm transition-all duration-500',
+                      active === i
+                        ? 'scale-100 rotate-3 border-white/25 bg-white/[0.08]'
+                        : 'scale-90 rotate-0',
+                    )}>
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.15),transparent_70%)]" />
+                    <service.icon
+                      size={24}
+                      strokeWidth={1.5}
+                      className={cn(
+                        'relative transition-colors duration-500',
+                        active === i ? 'text-white' : 'text-white/50',
+                      )}
+                    />
+                  </div>
+                  <span className="font-serif text-sm text-white/30">{service.num}</span>
+                </div>
 
                 <h3
                   className={cn(
-                    'col-span-10 font-serif text-[clamp(1.4rem,3.5vw,2.5rem)] transition-all duration-500 md:col-span-5',
+                    'font-serif text-[clamp(1.4rem,3.5vw,2.5rem)] transition-all duration-500 md:col-span-5',
                     active === i ? 'translate-x-2 text-white' : 'text-white/80',
                   )}>
                   {service.title}
                 </h3>
 
-                <p className="col-span-12 text-[14px] leading-relaxed text-white/45 md:col-span-6 md:pl-8">
+                <p className="text-[14px] leading-relaxed text-white/45 md:col-span-6 md:pl-8">
                   {service.text}
                 </p>
-
-                {/* превью при наведении */}
-                <div
-                  className={cn(
-                    'pointer-events-none absolute right-[8%] top-1/2 hidden h-40 w-32 -translate-y-1/2 overflow-hidden rounded-xl transition-all duration-500 lg:block',
-                    active === i ? 'scale-100 opacity-100 rotate-3' : 'scale-90 opacity-0',
-                  )}>
-                  <Image
-                    src={service.image}
-                    alt=""
-                    width={300}
-                    height={400}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
               </div>
             </Reveal>
           ))}

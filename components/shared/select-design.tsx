@@ -17,7 +17,7 @@ export const SelectDesign: React.FC<Props> = ({ setSelectPrint, selectPrint, fil
       {filtredDesigns.map((item) => (
         <div key={item.id} className="relative">
           {item.id === selectPrint && (
-            <div className="absolute -bottom-1 right-0 z-50 flex items-center justify-center bg-black w-[18px] h-[18px] rounded-full">
+            <div className="absolute -bottom-1 right-0 z-50 flex items-center justify-center bg-[#690B23] w-[18px] h-[18px] rounded-full">
               <Check size={15} className="text-[#a7a7a7]" />
             </div>
           )}

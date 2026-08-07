@@ -156,7 +156,7 @@ export const DialogOrder: React.FC<Props> = ({
                   </div>
                 </div>
 
-                <Button className="cursor-pointer w-full h-[40px] bg-black text-white rounded-lg mt-4 md:mt-auto">
+                <Button className="cursor-pointer w-full h-[40px] bg-[#690B23] text-white rounded-lg mt-4 md:mt-auto">
                   Заказать
                 </Button>
               </form>

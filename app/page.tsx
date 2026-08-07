@@ -17,7 +17,7 @@ export default function Home() {
         <Marquee />
         <About />
         <Services />
-        <Works />
+        {/* <Works /> */}
         <Pricing />
         <Cta />
       </main>

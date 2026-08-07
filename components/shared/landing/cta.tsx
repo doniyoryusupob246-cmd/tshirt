@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react';
 
 export const Cta = () => {
   return (
-    <section className="relative overflow-hidden bg-neutral-950 py-28 text-white md:py-40">
+    <section className="relative overflow-hidden bg-[#690B23] py-28 text-white md:py-40">
       <div className="pointer-events-none absolute inset-0">
         <div className="animate-aurora absolute left-1/2 top-1/2 h-[70vw] w-[70vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.10),transparent_65%)] blur-3xl" />
       </div>

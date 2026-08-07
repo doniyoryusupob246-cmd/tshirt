@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { X } from 'lucide-react';
 import React from 'react';
 import { Container } from './container';
+import Image from 'next/image';
 
 interface Props {
   className?: string;
@@ -56,9 +57,14 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
             href="/"
             className={cn(
               'font-serif text-[22px] tracking-[0.2em] transition-colors duration-500',
-              solid ? 'text-neutral-900' : 'text-white',
+              solid ? 'text-[#690B23]' : 'text-white',
             )}>
-            ATELIER
+            <Image
+              src={solid ? '/logo_solid.svg' : '/logo_light.svg'}
+              width={150}
+              height={100}
+              alt="Logo"
+            />
           </Link>
 
           <nav className="hidden md:flex items-center gap-8">
@@ -86,7 +92,7 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
                 'group relative hidden overflow-hidden rounded-full px-5 py-2.5 text-[13px] tracking-wide transition-all duration-300 sm:block',
                 pathname === '/design' && 'pointer-events-none opacity-60',
                 solid
-                  ? 'bg-neutral-900 text-white hover:bg-neutral-700'
+                  ? 'bg-[#690B23] text-white hover:bg-[#8a1030]'
                   : 'bg-white text-neutral-900 hover:bg-white/90',
               )}>
               <span className="relative z-10">Твой дизайн</span>
@@ -119,7 +125,7 @@ export const Nav: React.FC<Props> = ({ className, overlay = false }) => {
       {/* MOBILE MENU — полноэкранный непрозрачный оверлей, а не выпадашка внутри шапки */}
       <div
         className={cn(
-          'fixed inset-0 z-110 bg-neutral-950 transition-opacity duration-300 md:hidden',
+          'fixed inset-0 z-110 bg-[#690B23] transition-opacity duration-300 md:hidden',
           open ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}>
         <Container className="flex h-full flex-col pt-6">

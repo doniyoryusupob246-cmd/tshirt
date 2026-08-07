@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: 'ATELIER — печать и кастомизация одежды',
+  title: 'TheShirt — печать и кастомизация одежды',
   description:
     'Студия печати на одежде. Собственный конструктор, премиальные материалы, срок 1–2 дня.',
 };

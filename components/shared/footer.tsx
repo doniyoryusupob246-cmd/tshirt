@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Container } from './container';
+import Image from 'next/image';
 
 const NAV = [
   { href: '/#about', label: 'О нас' },
@@ -12,11 +13,11 @@ const NAV = [
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-white/10 bg-neutral-950 pb-10 pt-16 text-white">
+    <footer className="border-t border-white/10 bg-[#690B23] pb-10 pt-16 text-white">
       <Container>
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <p className="font-serif text-[22px] tracking-[0.2em]">ATELIER</p>
+            <Image src={'/logo_light.svg'} width={150} height={100} alt="Logo" />
             <p className="mt-5 max-w-xs text-[14px] leading-relaxed text-white/45">
               Студия печати и кастомизации одежды. Делаем вещи, которые хочется носить.
             </p>
@@ -56,7 +57,7 @@ export const Footer = () => {
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-[12px] text-white/30 md:flex-row">
-          <p>© {new Date().getFullYear()} ATELIER. Все права защищены.</p>
+          <p>© {new Date().getFullYear()} TheShirt. Все права защищены.</p>
           <p>Сделано с любовью к деталям</p>
         </div>
       </Container>
